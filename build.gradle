@@ -1,0 +1,110 @@
+group = 'com.vg.bigfoot.front'
+version = '0.0.1-SNAPSHOT'
+
+repositories {
+    mavenLocal()
+    jcenter()
+    maven { url "https://kotlin.bintray.com/kotlinx" }
+    maven { url "https://kotlin.bintray.com/kotlin-js-wrappers" }
+    maven { url "http://dl.bintray.com/kotlin/kotlin-eap" }
+}
+
+
+buildscript {
+    ext.kotlin_version = "1.3.11"
+    ext.html_version = "0.6.6"
+
+    repositories {
+        mavenLocal()
+        jcenter()
+        maven { url "http://dl.bintray.com/kotlin/kotlin-eap" }
+    }
+
+    dependencies {
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        classpath "org.jetbrains.kotlin:kotlin-frontend-plugin:0.0.44"
+    }
+}
+
+apply plugin: 'kotlin2js'
+//apply plugin: 'kotlin-dce-js'
+apply plugin: 'org.jetbrains.kotlin.frontend'
+
+kotlinFrontend {
+    sourceMaps = true
+
+    npm {
+        dependency("react", "16.6.0")
+        dependency("react-dom", "16.6.0")
+        dependency("react-router-dom", "4.3.1")
+
+        // kotlin-styled native deps
+        dependency("inline-style-prefixer")
+        dependency("styled-components", "4.1.2")
+
+        devDependency("css-loader")
+        devDependency("style-loader")
+        devDependency("babel-loader")
+        devDependency("babel-core")
+        devDependency("@babel/core")
+        devDependency("karma")
+    }
+
+    webpackBundle {
+        sourceMaps = true
+        sourceMapEnabled = true
+    }
+}
+
+compileKotlin2Js {
+    kotlinOptions.metaInfo = true
+    kotlinOptions.outputFile = "$project.buildDir.path/js/${project.name}.js"
+    kotlinOptions.sourceMap = true
+    kotlinOptions.sourceMapEmbedSources = "always"
+    kotlinOptions.moduleKind = 'commonjs'
+    kotlinOptions.main = "call"
+}
+
+compileTestKotlin2Js {
+    kotlinOptions.metaInfo = true
+    kotlinOptions.outputFile = "$project.buildDir.path/jstest/${project.name}.js"
+    kotlinOptions.sourceMap = true
+    kotlinOptions.sourceMapEmbedSources = "always"
+    kotlinOptions.moduleKind = 'commonjs'
+    kotlinOptions.main = "call"
+}
+
+sourceSets {
+    main {
+        kotlin.srcDirs += "src"
+        resources.srcDirs += "resources"
+        output.resourcesDir = "build/js/resources"
+    }
+    test {
+        kotlin.srcDirs += "test"
+        resources.srcDirs += "testResources"
+    }
+}
+
+dependencies {
+    compile "org.jetbrains.kotlin:kotlin-stdlib-js:$kotlin_version"
+    compile "org.jetbrains.kotlinx:kotlinx-html-js:$html_version"
+
+    compile 'org.jetbrains:kotlin-react:16.6.0-pre.65-kotlin-1.3.11'
+    compile "org.jetbrains:kotlin-react-dom:16.6.0-pre.65-kotlin-1.3.11"
+    compile 'org.jetbrains:kotlin-react-router-dom:4.3.1-pre.65-kotlin-1.3.11'
+
+    compile 'org.jetbrains:kotlin-css:1.0.0-pre.65-kotlin-1.3.11'
+    compile 'org.jetbrains:kotlin-css-js:1.0.0-pre.65-kotlin-1.3.11'
+    compile 'org.jetbrains:kotlin-styled:1.0.0-pre.65-kotlin-1.3.11'
+//    compile "org.jetbrains.kotlinx:kotlinx-coroutines-core-js:0.27.0-eap13"
+
+
+    compile "org.jetbrains.kotlin:kotlin-test-js:$kotlin_version"
+}
+
+kotlin {
+    experimental {
+        coroutines "enable"
+    }
+}
